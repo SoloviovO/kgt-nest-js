@@ -43,16 +43,15 @@ export class TasksController {
   @UsePipes(new ValidationPipe())
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createTaskDto: CreateTaskDto, @Req() req: any): Promise<Task> {
-    const userId = req.user;
+    const { user } = req.user;
 
     const taskWithUserId = {
       ...createTaskDto,
-      userId,
+      owner: user,
     };
-    console.log(taskWithUserId);
+    console.log(user);
 
     return this.taskService.create(taskWithUserId);
-    // return this.taskService.create(createTaskDto);
   }
 
   @Delete(':id')

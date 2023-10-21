@@ -1,4 +1,9 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  BadRequestException,
+  NotFoundException,
+  Injectable,
+} from '@nestjs/common';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { InjectModel } from '@nestjs/mongoose';
@@ -6,6 +11,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import { TokenService } from 'src/token/token.service';
+import { AppError } from 'src/common/constants/errors';
 
 @Injectable()
 export class UsersService {
@@ -18,10 +24,8 @@ export class UsersService {
     const { email, password } = createUserDto;
 
     const existingUser = await this.userModel.findOne({ email });
+    if (existingUser) throw new ConflictException(AppError.USER_EXIST);
 
-    if (existingUser) {
-      throw new ConflictException('User with this email already exists');
-    }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new this.userModel({ email, password: hashedPassword });
     const savedUser = await newUser.save();
@@ -36,22 +40,26 @@ export class UsersService {
 
   async login(createUserDto: CreateUserDto): Promise<User> {
     const { email, password } = createUserDto;
+
     const existingUser = await this.userModel.findOne({ email });
+    if (!existingUser) throw new NotFoundException(AppError.USER_NOT_EXIST);
 
     const validatePassword = await bcrypt.compare(
       password,
       existingUser.password,
     );
 
-    if (!validatePassword) {
-      throw new ConflictException('Email or password is wrong');
-    }
-    const token = await this.tokenService.generateJwtToken(email);
+    if (!validatePassword)
+      throw new BadRequestException(AppError.USER_BAD_DATA);
+
+    const token = await this.tokenService.generateJwtToken(existingUser._id);
 
     const userResponse = {
       id: existingUser._id,
       email: existingUser.email,
       accessToken: token,
+      projects: [],
+      tasks: [],
     };
 
     return userResponse;

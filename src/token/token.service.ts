@@ -1,18 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { config } from 'dotenv';
-
-config();
-const { JWT_SECRET, JWT_EXPIRES_IN_SECONDS } = process.env;
+import getConfiguration from '../configurations';
 
 @Injectable()
 export class TokenService {
-  constructor(private readonly jwtService: JwtService) {}
-  async generateJwtToken(user) {
+  private readonly configurations: ReturnType<typeof getConfiguration>;
+  constructor(private readonly jwtService: JwtService) {
+    this.configurations = getConfiguration();
+  }
+
+  async generateJwtToken(user: any) {
     const payload = { user };
+
     const token = this.jwtService.sign(payload, {
-      secret: JWT_SECRET,
-      expiresIn: JWT_EXPIRES_IN_SECONDS,
+      secret: this.configurations.jwtSecret,
+      expiresIn: this.configurations.jwtExpires,
     });
     return token;
   }

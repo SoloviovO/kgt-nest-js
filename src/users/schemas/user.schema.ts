@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
+import { Project } from 'src/projects/schemas/project.schema';
+import { Task } from 'src/tasks/schemas/task.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -21,6 +23,12 @@ export class User {
     trim: true,
   })
   password?: string;
+
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }] })
+  projects?: Project[];
+
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }] })
+  tasks?: Task[];
 
   @Prop()
   accessToken?: string;

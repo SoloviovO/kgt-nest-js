@@ -6,11 +6,11 @@ import { User, UsersSchema } from './schemas/user.schema';
 import { TokenModule } from 'src/token/token.module';
 
 @Module({
-  controllers: [UsersController],
-  providers: [UsersService],
   imports: [
     TokenModule,
     MongooseModule.forFeature([{ name: User.name, schema: UsersSchema }]),
   ],
+  controllers: [UsersController],
+  providers: [UsersService],
 })
 export class UsersModule {}

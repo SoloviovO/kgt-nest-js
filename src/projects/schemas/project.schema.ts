@@ -20,7 +20,7 @@ export class Project {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   owner: User;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }] })
+  @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }])
   tasks: Task[];
 }
 

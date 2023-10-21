@@ -1,5 +1,5 @@
 import { IsEnum, IsString } from 'class-validator';
-import { STATUS_TYPE } from '../../enums/enums';
+import { STATUS_TYPE } from '../../common/enums/enums';
 
 export class UpdateTaskStatusDto {
   @IsString()

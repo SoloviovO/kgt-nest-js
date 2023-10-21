@@ -1,13 +1,23 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { config } from 'dotenv';
-
-config();
-const { PORT } = process.env;
+import { ConfigService } from '@nestjs/config';
+import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { abortOnError: false });
   app.setGlobalPrefix('api');
-  await app.listen(PORT);
+  app.useGlobalPipes(new ValidationPipe());
+  const configService = app.get(ConfigService);
+  const port = configService.get('port');
+  const config = new DocumentBuilder()
+    .setTitle('Swagger kg-test')
+    .setDescription('API documentation for kg-test')
+    .setVersion('1.0')
+    .addTag('tasks')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+  await app.listen(port);
 }
 bootstrap();

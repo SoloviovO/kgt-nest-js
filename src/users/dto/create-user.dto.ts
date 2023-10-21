@@ -14,14 +14,11 @@ export class CreateUserDto {
   readonly email: string;
 
   @IsString()
-  @MinLength(6)
-  @MaxLength(16)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{6,16})/, {
-    message: 'Password is too weak',
+  @IsNotEmpty()
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
+  @MaxLength(16, { message: 'Password must not exceed 16 characters' })
+  @Matches(/^(?=.*[a-z])(?=.*[A-Z])/, {
+    message: 'Password must contain both upper and lower case letters',
   })
   readonly password: string;
-
-  readonly accessToken: string;
-
-  readonly id: string;
 }
