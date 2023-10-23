@@ -12,7 +12,7 @@ import {
   Req,
   Query,
 } from '@nestjs/common';
-import { ApiTags, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 
 import { AuthGuard } from 'src/users/users.guard';
 import { STATUS_TYPE } from 'src/common/enums/enums';
@@ -25,6 +25,7 @@ import { UpdateTaskStatusDto } from './dto/update-taskStatus.dto';
 import { TaskResponse } from './response';
 
 @ApiTags('Task')
+@ApiBearerAuth('Bearer')
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly taskService: TaskService) {}

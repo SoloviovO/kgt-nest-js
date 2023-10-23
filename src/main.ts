@@ -14,6 +14,11 @@ async function bootstrap() {
     .setTitle('Swagger kg-test')
     .setDescription('API documentation for kg-test')
     .setVersion('1.0')
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'Bearer',
+    )
+
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);

@@ -11,6 +11,7 @@ export class CreateProjectDto {
   readonly title: string;
 
   @ApiProperty({
+    required: false,
     example: 'Passionate cleaning',
     description: 'Description of project',
   })
