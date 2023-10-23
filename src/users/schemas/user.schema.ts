@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
+
 import { Project } from 'src/projects/schemas/project.schema';
 import { Task } from 'src/tasks/schemas/task.schema';
 
@@ -11,7 +12,7 @@ export type UserDocument = HydratedDocument<User>;
 })
 export class User {
   @Prop({
-    required: [true, 'Email is required!'],
+    required: true,
     unique: true,
     trim: true,
     index: true,
@@ -19,7 +20,7 @@ export class User {
   email: string;
 
   @Prop({
-    required: [true, 'Password is required!'],
+    required: true,
     trim: true,
   })
   password?: string;

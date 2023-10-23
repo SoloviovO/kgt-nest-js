@@ -14,10 +14,9 @@ async function bootstrap() {
     .setTitle('Swagger kg-test')
     .setDescription('API documentation for kg-test')
     .setVersion('1.0')
-    .addTag('tasks')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api-docs', app, document);
   await app.listen(port);
 }
 bootstrap();

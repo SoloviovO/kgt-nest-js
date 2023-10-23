@@ -6,19 +6,30 @@ import {
   IsEmail,
   Matches,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+
+import { AppValidation } from 'src/common/constants/validation';
 
 export class CreateUserDto {
+  @ApiProperty({
+    example: 'Test@example.com',
+    description: 'User email',
+  })
   @IsString()
   @IsNotEmpty()
   @IsEmail()
   readonly email: string;
 
+  @ApiProperty({
+    example: '123456789Zz',
+    description: 'User password',
+  })
   @IsString()
   @IsNotEmpty()
-  @MinLength(6, { message: 'Password must be at least 6 characters long' })
-  @MaxLength(16, { message: 'Password must not exceed 16 characters' })
+  @MinLength(6, { message: AppValidation.PASSWORD_MIN })
+  @MaxLength(16, { message: AppValidation.PASSWORD_MAX })
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])/, {
-    message: 'Password must contain both upper and lower case letters',
+    message: AppValidation.PASSWORD_TYPE,
   })
   readonly password: string;
 }
