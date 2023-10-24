@@ -26,6 +26,7 @@ export class ProjectsController {
 
   @ApiResponse({ status: 201, type: ProjectResponse })
   @ApiResponse({ status: 400, description: AppError.VALIDATION_MESSAGE })
+  @ApiResponse({ status: 401, description: AppError.UNAUTHORIZED })
   @Post()
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.CREATED)
@@ -33,13 +34,13 @@ export class ProjectsController {
     @Body() createProjectDto: CreateProjectDto,
     @Req() req: any,
   ): Promise<Project> {
-    const { user } = req.user;
-    const userId = user._id;
-    return this.projectsService.create(createProjectDto, userId);
+    const { _id } = req.user;
+    return this.projectsService.create(createProjectDto, _id);
   }
 
   @ApiResponse({ status: 200, type: ProjectAppendResponse })
   @ApiResponse({ status: 400, description: AppError.TASK_ADDED })
+  @ApiResponse({ status: 401, description: AppError.UNAUTHORIZED })
   @ApiResponse({ status: 404, description: AppError.PROJECT_NOT_EXIST })
   @Patch('addtask/:taskId/:projectId')
   @UseGuards(AuthGuard)
@@ -47,7 +48,9 @@ export class ProjectsController {
   appendTaskToProject(
     @Param('taskId') taskId: string,
     @Param('projectId') projectId: string,
+    @Req() req: any,
   ): Promise<Project> {
-    return this.projectsService.append(taskId, projectId);
+    const { _id } = req.user;
+    return this.projectsService.append(taskId, projectId, _id);
   }
 }

@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { AppError } from 'src/common/constants/errors';
 import { STATUS_TYPE } from 'src/common/enums/enums';
 import { Project, ProjectDocument } from 'src/projects/schemas/project.schema';
+import { isValidObjectId } from 'src/common/helpers/objectId.helper';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { UpdateTaskStatusDto } from './dto/update-taskStatus.dto';
@@ -42,6 +43,7 @@ export class TaskService {
     }
 
     if (projectId) {
+      isValidObjectId(projectId);
       filter.project = projectId;
     }
 
@@ -67,7 +69,9 @@ export class TaskService {
     return { tasks, total };
   }
 
-  async getById(id: string): Promise<Task> {
+  async getById(id: string, userId: string): Promise<Task> {
+    isValidObjectId(id);
+    await this.findTaskByIdAndCheckOwnership(id, userId);
     return this.taskModel.findById(id);
   }
 
@@ -82,6 +86,7 @@ export class TaskService {
   }
 
   async remove(id: string, userId: string): Promise<Task> {
+    isValidObjectId(id);
     const task = await this.findTaskByIdAndCheckOwnership(id, userId);
 
     const projects = await this.projectModel.find({ tasks: task._id });
@@ -103,6 +108,7 @@ export class TaskService {
     taskDto: UpdateTaskDto,
     userId: string,
   ): Promise<Task> {
+    isValidObjectId(id);
     await this.findTaskByIdAndCheckOwnership(id, userId);
 
     const updatedTask = await this.taskModel.findByIdAndUpdate(id, taskDto, {
@@ -117,6 +123,7 @@ export class TaskService {
     taskDto: UpdateTaskStatusDto,
     userId: string,
   ): Promise<Task> {
+    isValidObjectId(id);
     await this.findTaskByIdAndCheckOwnership(id, userId);
 
     const updatedTask = await this.taskModel.findByIdAndUpdate(id, taskDto, {

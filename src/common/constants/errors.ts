@@ -9,4 +9,6 @@ export const AppError = {
   TASK_NOT_EXIST: 'This task is not found',
   PROJECT_NOT_EXIST: 'This project is not found',
   VALIDATION_MESSAGE: 'Validation fields error',
+  UNAUTHORIZED: 'Unauthorized',
+  ID_NOT_VALID: 'Invalid ObjectId',
 };

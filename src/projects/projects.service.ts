@@ -7,9 +7,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { AppError } from 'src/common/constants/errors';
+import { Task, TaskDocument } from 'src/tasks/schemas/task.schema';
+import { isValidObjectId } from 'src/common/helpers/objectId.helper';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { Project, ProjectDocument } from './schemas/project.schema';
-import { Task, TaskDocument } from 'src/tasks/schemas/task.schema';
 
 @Injectable()
 export class ProjectsService {
@@ -30,12 +31,25 @@ export class ProjectsService {
     return newProject.save();
   }
 
-  async append(taskId: string, projectId: string): Promise<Project> {
-    const task = await this.taskModel.findById(taskId);
-    if (!task) throw new NotFoundException(AppError.TASK_NOT_EXIST);
+  async append(
+    taskId: string,
+    projectId: string,
+    userId: string,
+  ): Promise<Project> {
+    isValidObjectId(taskId);
+    isValidObjectId(projectId);
+    const task = await this.taskModel.findOne({ _id: taskId, owner: userId });
+    if (!task) {
+      throw new NotFoundException(AppError.TASK_NOT_EXIST);
+    }
 
-    const project = await this.projectModel.findById(projectId);
-    if (!project) throw new NotFoundException(AppError.PROJECT_NOT_EXIST);
+    const project = await this.projectModel.findOne({
+      _id: projectId,
+      owner: userId,
+    });
+    if (!project) {
+      throw new NotFoundException(AppError.PROJECT_NOT_EXIST);
+    }
 
     if (!project.tasks.some((task) => task.toString() === taskId)) {
       project.tasks.push(task);

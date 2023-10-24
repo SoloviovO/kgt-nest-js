@@ -31,6 +31,8 @@ export class TasksController {
   constructor(private readonly taskService: TaskService) {}
 
   @ApiResponse({ status: 200, type: [TaskResponse] })
+  @ApiResponse({ status: 400, description: AppError.ID_NOT_VALID })
+  @ApiResponse({ status: 401, description: AppError.UNAUTHORIZED })
   @Get()
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
@@ -71,53 +73,50 @@ export class TasksController {
     @Query('sortBy') sortBy: string,
     @Req() req: any,
   ): Promise<{ tasks: Task[]; total: number }> {
-    const { user } = req.user;
-    const userId = user._id;
+    const { _id } = req.user;
 
-    return this.taskService.getAll(
-      page,
-      limit,
-      status,
-      projectId,
-      sortBy,
-      userId,
-    );
+    return this.taskService.getAll(page, limit, status, projectId, sortBy, _id);
   }
 
   @ApiResponse({ status: 200, type: TaskResponse })
+  @ApiResponse({ status: 400, description: AppError.ID_NOT_VALID })
+  @ApiResponse({ status: 401, description: AppError.UNAUTHORIZED })
   @ApiResponse({ status: 404, description: AppError.USER_NOT_TASK })
   @Get(':id')
   @UseGuards(AuthGuard)
-  getOne(@Param('id') id: string): Promise<Task> {
-    return this.taskService.getById(id);
+  getOne(@Param('id') id: string, @Req() req: any): Promise<Task> {
+    const { _id } = req.user;
+    return this.taskService.getById(id, _id);
   }
 
   @ApiResponse({ status: 201, type: TaskResponse })
   @ApiResponse({ status: 400, description: AppError.VALIDATION_MESSAGE })
+  @ApiResponse({ status: 401, description: AppError.UNAUTHORIZED })
   @ApiResponse({ status: 404, description: AppError.USER_NOT_TASK })
   @Post()
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.CREATED)
   create(@Body() createTaskDto: CreateTaskDto, @Req() req: any): Promise<Task> {
-    const { user } = req.user;
-    const userId = user._id;
+    const { _id } = req.user;
 
-    return this.taskService.create(createTaskDto, userId);
+    return this.taskService.create(createTaskDto, _id);
   }
 
   @ApiResponse({ status: 204 })
+  @ApiResponse({ status: 400, description: AppError.ID_NOT_VALID })
+  @ApiResponse({ status: 401, description: AppError.UNAUTHORIZED })
   @ApiResponse({ status: 404, description: AppError.USER_NOT_TASK })
   @Delete(':id')
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string, @Req() req: any): Promise<Task> {
-    const { user } = req.user;
-    const userId = user._id;
-    return this.taskService.remove(id, userId);
+    const { _id } = req.user;
+    return this.taskService.remove(id, _id);
   }
 
   @ApiResponse({ status: 200, type: TaskResponse })
   @ApiResponse({ status: 400, description: AppError.VALIDATION_MESSAGE })
+  @ApiResponse({ status: 401, description: AppError.UNAUTHORIZED })
   @ApiResponse({ status: 404, description: AppError.USER_NOT_TASK })
   @Patch(':id')
   @UseGuards(AuthGuard)
@@ -127,13 +126,13 @@ export class TasksController {
     @Param('id') id: string,
     @Req() req: any,
   ): Promise<Task> {
-    const { user } = req.user;
-    const userId = user._id;
-    return this.taskService.update(id, updateTaskDto, userId);
+    const { _id } = req.user;
+    return this.taskService.update(id, updateTaskDto, _id);
   }
 
   @ApiResponse({ status: 200, type: TaskResponse })
   @ApiResponse({ status: 400, description: AppError.VALIDATION_MESSAGE })
+  @ApiResponse({ status: 401, description: AppError.UNAUTHORIZED })
   @ApiResponse({ status: 404, description: AppError.USER_NOT_TASK })
   @Patch(':id/status')
   @UseGuards(AuthGuard)
@@ -143,8 +142,7 @@ export class TasksController {
     @Param('id') id: string,
     @Req() req: any,
   ): Promise<Task> {
-    const { user } = req.user;
-    const userId = user._id;
-    return this.taskService.updateStatus(id, updateTaskStatusDto, userId);
+    const { _id } = req.user;
+    return this.taskService.updateStatus(id, updateTaskStatusDto, _id);
   }
 }
